@@ -1,0 +1,7 @@
+.git
+.gitignore
+.gitlab-ci.yml
+
+*.md
+*.txt
+*.log
