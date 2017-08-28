@@ -26,13 +26,17 @@ RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash - \
     libreoffice-opensymbol-fonts \
   && yum clean all
 
-WORKDIR pastor
+RUN useradd --no-log-init --create-home pastor
+
+USER pastor
+
+WORKDIR /home/pastor
 
 COPY package.json package-lock.json ./
 
 RUN npm install --production
 
-COPY ./index.js ./
+COPY ./ ./
 
 ENV PORT 8080
 
