@@ -33,6 +33,16 @@ curl -X POST \
   -F 'html=@/example'
 ```
 
+## Demo
+The project is running under the name TecnoSpeed Printer at:
+```
+https://api.tecnospeed.com.br/printer/v1
+```
+For demonstration, feel free to use the token (as Header) below:
+```
+x-api-key: xbVP99TsPA5ZvVTjg41BI9YNfYfxKB549wfZI3FC
+```
+
 ## About the Docker image
 
 - CentOS 7
