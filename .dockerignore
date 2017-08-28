@@ -1,6 +1,10 @@
+node_modules
+
+.dockerignore
 .git
 .gitignore
 .gitlab-ci.yml
+.tool-versions
 
 *.md
 *.txt
