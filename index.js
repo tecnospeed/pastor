@@ -30,6 +30,11 @@ function handler(request, response) {
       response.end()
       break
 
+    case "/status":
+      response.writeHead(200)
+      response.end()
+      break
+
     default:
       requestToUri(request)
         .then(browser.uriToPdf)
