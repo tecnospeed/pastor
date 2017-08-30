@@ -38,9 +38,13 @@ The project is running under the name TecnoSpeed Printer at:
 ```
 https://api.tecnospeed.com.br/printer/v1
 ```
-For demonstration, feel free to use the token (as Header) below:
+For demonstration, feel free to use the token (as header) below:
 ```
 x-api-key: xbVP99TsPA5ZvVTjg41BI9YNfYfxKB549wfZI3FC
+```
+Just here is necessary to explicitly request (header too) for a pdf:
+```
+Accept: application/pdf
 ```
 
 ## About the Docker image
