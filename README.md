@@ -33,6 +33,14 @@ curl -X POST \
   -F 'html=@/example'
 ```
 
+## Docker
+
+It's being stored on Docker Hub [tecnospeed/pastor](https://hub.docker.com/r/tecnospeed/pastor/). Based on `centos:7` and installing `Node 8.x` following the [official instructions](https://nodejs.org/en/download/package-manager/#enterprise-linux-and-fedora).
+
+Some dependencies (GConf2, gtk3, libX11, libXScrnSaver and redhat-lsb) are installed to run properly the Chromium on CentOS 7.
+
+The [puppeteer](https://github.com/GoogleChrome/puppeteer) `install.js` script is responsible for downloading the Chromium during the `npm install`.
+
 ## Demo
 The project is running under the name TecnoSpeed Printer at:
 ```
@@ -47,17 +55,6 @@ Just here is necessary to explicitly request (header too) for a pdf:
 Accept: application/pdf
 ```
 
-## About the Docker image
-
-- CentOS 7
-- Node 8.x
-
-### Chromium dependencies
-- GConf2
-- gtk3
-- libX11
-- libXScrnSaver
-- redhat-lsb
 
 ### Supported Fonts
 #### A
