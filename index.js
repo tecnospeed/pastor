@@ -1,5 +1,5 @@
 const formidable = require("formidable")
-const browser = require("./lib/browser")
+const converter = require("./lib/converter")
 const winston = require("winston")
 const http = require("http")
 const url = require("url")
@@ -47,7 +47,7 @@ function handler(request, response) {
 
     default:
       requestToUri(request)
-        .then(browser.uriToPdf)
+        .then(converter.uriToPdf)
         .then(pdf => {
           response.writeHead(200, { "Content-Type": "application/pdf" })
           response.end(pdf)
