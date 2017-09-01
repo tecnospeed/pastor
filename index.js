@@ -4,21 +4,31 @@ const winston = require("winston")
 const http = require("http")
 const url = require("url")
 
-function requestToUri(request) {
+function requestData(request) {
   return new Promise((resolve, reject) => {
-    let query = url.parse(request.url, true).query
-    if (query.url) return resolve(query.url)
-
     let form = new formidable.IncomingForm()
     form.parse(request, (err, fields, files) => {
       if (err) return reject(err)
 
-      let formUrl = fields.url && url.parse(fields.url)
-      if (formUrl) return resolve(formUrl.href)
+      let query = url.parse(request.url, true).query
+
+      resolve({ fields, files, query })
+    })
+  })
+}
+
+function requestToUri(request) {
+  return new Promise((resolve, reject) => {
+    requestData(request).then(({ fields, files, query }) => {
+      if (query.url) return resolve(query.url)
+
+      if (fields.url) {
+        let formUrl = url.parse(fields.url)
+        if (formUrl) return resolve(formUrl.href)
+        return reject()
+      }
 
       if (files.html) return resolve(`file://${files.html.path}`)
-
-      return resolve()
     })
   })
 }
