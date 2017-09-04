@@ -4,8 +4,8 @@ const winston = require("winston")
 const http = require("http")
 const url = require("url")
 
-function requestData(request) {
-  return new Promise((resolve, reject) => {
+const requestData = request =>
+  new Promise((resolve, reject) => {
     let form = new formidable.IncomingForm()
     form.parse(request, (err, fields, files) => {
       if (err) return reject(err)
@@ -15,25 +15,26 @@ function requestData(request) {
       resolve({ fields, files, query })
     })
   })
-}
 
-function requestToUri(request) {
-  return new Promise((resolve, reject) => {
-    requestData(request).then(({ fields, files, query }) => {
-      if (query.url) return resolve(query.url)
+const uriFromData = ({ fields, files, query }) =>
+  new Promise((resolve, reject) => {
+    if (query.url) return resolve(query.url)
 
-      if (fields.url) {
-        let formUrl = url.parse(fields.url)
-        if (formUrl) return resolve(formUrl.href)
-        return reject()
-      }
+    if (fields.url) {
+      let formUrl = url.parse(fields.url)
+      if (formUrl) return resolve(formUrl.href)
+      return reject()
+    }
 
-      if (files.html) return resolve(`file://${files.html.path}`)
-    })
+    if (files.html) return resolve(`file://${files.html.path}`)
+
+    return reject("no url/html provided")
+  }).then(uri => {
+    winston.info(`requested: ${uri}`)
+    return uri
   })
-}
 
-function handler(request, response) {
+const handler = (request, response) => {
   switch (request.url) {
     case "/favicon.ico":
       response.writeHead(200, { "Content-Type": "image/x-icon" })
@@ -46,16 +47,17 @@ function handler(request, response) {
       break
 
     default:
-      requestToUri(request)
+      requestData(request)
+        .then(uriFromData)
         .then(converter.uriToPdf)
         .then(pdf => {
           response.writeHead(200, { "Content-Type": "application/pdf" })
           response.end(pdf)
         })
-        .catch(err => {
-          response.writeHead(400, { "Content-Type": "text/plain" })
+        .catch(reason => {
+          response.writeHead(400)
           response.end()
-          winston.error(err)
+          winston.warn(reason)
         })
   }
 }
