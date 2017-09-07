@@ -2,7 +2,7 @@ FROM centos:7
 
 LABEL project="Pastor"
 LABEL version="0.1.0"
-LABEL maintainer="rafael@gumieri.com"
+LABEL maintainer="rafael.gumieri@tecnospeed.com.br"
 
 RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash - \
   && yum install -y \

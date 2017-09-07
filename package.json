@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gumieri/pastor.git"
+    "url": "git+https://github.com/tecnospeed/pastor.git"
   },
   "author": "Rafael Gumieri",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gumieri/pastor/issues"
+    "url": "https://github.com/tecnospeed/pastor/issues"
   },
-  "homepage": "https://github.com/gumieri/pastor#readme",
+  "homepage": "https://github.com/tecnospeed/pastor#readme",
   "devDependencies": {
     "jest": "^20.0.4",
     "prettier": "^1.5.3"
