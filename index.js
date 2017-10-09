@@ -4,6 +4,8 @@ const winston = require("winston")
 const http = require("http")
 const url = require("url")
 
+const defaultMediaType = 'print'
+
 const requestData = request =>
   new Promise((resolve, reject) => {
     let form = new formidable.IncomingForm()
@@ -15,6 +17,12 @@ const requestData = request =>
       resolve({ fields, files, query })
     })
   })
+
+const parseRequest = ({ fields, files, query }) =>
+  Promise.all([
+    uriFromData({ fields, files, query }),
+    settingsFromData({ fields, query })
+  ])
 
 const uriFromData = ({ fields, files, query }) =>
   new Promise((resolve, reject) => {
@@ -34,6 +42,12 @@ const uriFromData = ({ fields, files, query }) =>
     return uri
   })
 
+const settingsFromData = ({ fields, query }) =>
+  new Promise((resolve, reject) => {
+    let mediaType = query.mediaType || fields.mediaType || defaultMediaType
+    resolve({ mediaType: mediaType })
+  })
+
 const handler = (request, response) => {
   switch (request.url) {
     case "/favicon.ico":
@@ -48,8 +62,10 @@ const handler = (request, response) => {
 
     default:
       requestData(request)
-        .then(uriFromData)
-        .then(converter.uriToPdf)
+        .then(parseRequest)
+        .then(([ uri, settings ]) => {
+          return converter.uriToPdf(uri, settings)
+        })
         .then(pdf => {
           response.writeHead(200, { "Content-Type": "application/pdf" })
           response.end(pdf)
