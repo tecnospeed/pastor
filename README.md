@@ -36,6 +36,22 @@ curl -X POST \
   -F 'html=@/example'
 ```
 
+### Specifying a media tpye
+
+Allowed types are `print` (default) and `screen`.
+Set your desired mediaType using the query parameter `mediaType`
+
+```bash
+  http://localhost:8080/?mediaType=screen
+```
+
+or a form field named `mediaType`.
+
+```bash
+  curl [...] \
+    -F 'mediaType=screen'
+```
+
 ## Docker
 
 It can be found at the Docker Hub as [tecnospeed/pastor](https://hub.docker.com/r/tecnospeed/pastor/).
