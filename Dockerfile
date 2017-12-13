@@ -7,13 +7,11 @@ LABEL maintainer="rafael.gumieri@tecnospeed.com.br"
 RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash - \
   && yum install -y \
     nodejs \
-# Chromium dependencies
     GConf2 \
     gtk3 \
     libX11 \
     libXScrnSaver \
     redhat-lsb \
-# Fonts
     xorg-x11-utils \
     xorg-x11-fonts-misc \
     xorg-x11-fonts-75dpi \
@@ -25,6 +23,9 @@ RUN curl --silent --location https://rpm.nodesource.com/setup_8.x | bash - \
     ipa-gothic-fonts \
     libreoffice-opensymbol-fonts \
   && yum clean all
+
+RUN curl --silent --location --output /usr/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.1/dumb-init_1.2.1_amd64 \
+  && chmod +x /usr/bin/dumb-init
 
 RUN useradd --no-log-init --create-home pastor
 
@@ -41,5 +42,7 @@ COPY ./ ./
 ENV PORT 8080
 
 EXPOSE 8080
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 CMD ["node", "index.js"]
