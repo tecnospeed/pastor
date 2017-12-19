@@ -3,6 +3,7 @@ const converter = require("./lib/converter")
 const winston = require("winston")
 const http = require("http")
 const url = require("url")
+const qs = require("qs")
 
 const requestData = request =>
   new Promise((resolve, reject) => {
@@ -10,28 +11,41 @@ const requestData = request =>
     form.parse(request, (err, fields, files) => {
       if (err) return reject(err)
 
-      let query = url.parse(request.url, true).query
+      let options = qs.parse(url.parse(request.url).query)
 
-      resolve({ fields, files, query })
+      resolve({ fields, files, options })
     })
   })
 
-const uriFromData = ({ fields, files, query }) =>
+const uriFromData = ({ fields, files, options }) =>
   new Promise((resolve, reject) => {
-    if (query.url) return resolve(query.url)
+    if (options.url) {
+      options.uri = options.url
+
+      return resolve(options)
+    }
 
     if (fields.url) {
       let formUrl = url.parse(fields.url)
-      if (formUrl) return resolve(formUrl.href)
-      return reject()
+
+      if (!formUrl) return reject()
+
+      options.uri = formUrl.href
+
+      return resolve(options)
     }
 
-    if (files.html) return resolve(`file://${files.html.path}`)
+    if (files.html) {
+      options.uri = `file://${files.html.path}`
+
+      return resolve(options)
+    }
 
     return reject("no url/html provided")
-  }).then(uri => {
-    winston.info(`requested: ${uri}`)
-    return uri
+  }).then(options => {
+    winston.info('requested', options)
+
+    return options
   })
 
 const handler = (request, response) => {
