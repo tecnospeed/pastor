@@ -2,8 +2,10 @@ const formidable = require("formidable")
 const converter = require("./lib/converter")
 const winston = require("winston")
 const http = require("http")
+const tmp = require("tmp")
 const url = require("url")
 const qs = require("qs")
+const fs = require("fs")
 
 const requestData = request =>
   new Promise((resolve, reject) => {
@@ -16,6 +18,19 @@ const requestData = request =>
       resolve({ fields, files, options })
     })
   })
+
+const stringToFile = string =>
+  new Promise((resolve, reject) =>
+    tmp.file((err, path) => {
+      if (err) return reject(err.message)
+
+      fs.writeFile(path, string, (err) => {
+        if (err) return reject(err.message)
+
+        return resolve(path)
+      })
+    })
+  )
 
 const uriFromData = ({ fields, files, options }) =>
   new Promise((resolve, reject) => {
@@ -33,6 +48,14 @@ const uriFromData = ({ fields, files, options }) =>
       options.uri = formUrl.href
 
       return resolve(options)
+    }
+
+    if (fields.html) {
+      return stringToFile(fields.html)
+        .then(path => {
+          options.uri = `file://${path}`
+          return resolve(options)
+        })
     }
 
     if (files.html) {
