@@ -88,7 +88,10 @@ const handler = (request, response) => {
         .then(uriFromData)
         .then(converter.uriToPdf)
         .then(pdf => {
-          response.writeHead(200, { "Content-Type": "application/pdf" })
+          response.writeHead(200, {
+            "Content-Type": "application/pdf",
+            "Content-Length": pdf.byteLength
+          })
           response.end(pdf)
         })
         .catch(reason => {
