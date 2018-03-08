@@ -14,6 +14,7 @@ const converter = require('./lib/converter')
 const requestData = request =>
   new Promise((resolve, reject) => {
     let form = new formidable.IncomingForm()
+    form.keepExtensions = true;
     form.parse(request, (err, fields, files) => {
       if (err) return reject(err)
 
@@ -36,16 +37,16 @@ const uriToBuffer = uri =>
 
 const stringToFile = string =>
   new Promise((resolve, reject) =>
-    tmp.file((err, path) => {
-      if (err) return reject(err.message)
+    tmp.file({ postfix: '.html' }, (err, path) => {
+      if (err) return reject(err.message);
 
       fs.writeFile(path, string, err => {
-        if (err) return reject(err.message)
+        if (err) return reject(err.message);
 
-        return resolve(path)
-      })
+        return resolve(path);
+      });
     })
-  )
+  );
 
 const uriFromData = ({ fields, files, options }) =>
   new Promise((resolve, reject) => {
@@ -94,7 +95,7 @@ const uriFromData = ({ fields, files, options }) =>
         return resolve(options)
       })
     }
-
+    
     if (files.html) {
       options.uri = `file://${files.html.path}`
 
