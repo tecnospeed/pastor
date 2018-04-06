@@ -140,5 +140,8 @@ const handler = (request, response) => {
   }
 }
 
-http.createServer(handler).listen(process.env.PORT)
-winston.info(`Listening Port ${process.env.PORT}`)
+converter.launchChrome()
+  .then(() => {
+    http.createServer(handler).listen(process.env.PORT)
+    winston.info(`Listening Port ${process.env.PORT}`)
+  })
