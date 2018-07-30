@@ -1,7 +1,7 @@
 const formidable = require('formidable')
 const { JSDOM } = require('jsdom')
 const winston = require('winston')
-const request = require('request')
+const request = require('request-promise-native')
 const iconv = require('iconv-lite')
 const http = require('http')
 const tmp = require('tmp')
@@ -14,7 +14,7 @@ const converter = require('./lib/converter')
 const requestData = request =>
   new Promise((resolve, reject) => {
     let form = new formidable.IncomingForm()
-    form.keepExtensions = true;
+    form.keepExtensions = true
     form.parse(request, (err, fields, files) => {
       if (err) return reject(err)
 
@@ -24,92 +24,83 @@ const requestData = request =>
     })
   })
 
-const uriToBuffer = uri =>
-  new Promise((resolve, reject) =>
-    request(
-      { method: 'GET', url: uri, followAllRedirects: true, encoding: null },
-      (err, response, body) => {
-        if (err) return reject(err.message)
-        return resolve(body)
-      }
-    )
-  )
-
 const stringToFile = string =>
   new Promise((resolve, reject) =>
     tmp.file({ postfix: '.html' }, (err, path) => {
-      if (err) return reject(err.message);
+      if (err) return reject(err.message)
 
       fs.writeFile(path, string, err => {
-        if (err) return reject(err.message);
+        if (err) return reject(err.message)
 
-        return resolve(path);
-      });
+        return resolve(path)
+      })
     })
-  );
+  )
 
-const uriFromData = ({ fields, files, options }) =>
-  new Promise((resolve, reject) => {
-    if (options.url) {
-      options.uri = options.url
-
-      return resolve(options)
-    }
-
-    if (options.custom_url) {
-      return uriToBuffer(options.custom_url).then(buffer => {
-        let string
-        if (options.encoding) {
-          string = iconv.decode(buffer, options.encoding)
-        } else {
-          string = buffer.toString()
-        }
-
-        if (options.delete) {
-          let dom = new JSDOM(string)
-          let node = dom.window.document.getElementById(options.delete)
-          node.parentNode.removeChild(node)
-          string = dom.serialize()
-        }
-
-        return stringToFile(string).then(path => {
-          options.uri = `file://${path}`
-          return resolve(options)
-        })
-      })
-    }
-
-    if (fields.url) {
-      let formUrl = url.parse(fields.url)
-
-      if (!formUrl) return reject()
-
-      options.uri = formUrl.href
-
-      return resolve(options)
-    }
-
-    if (fields.html) {
-      return stringToFile(fields.html).then(path => {
-        options.uri = `file://${path}`
-        return resolve(options)
-      })
-    }
-    
-    if (files.html) {
-      options.uri = `file://${files.html.path}`
-
-      return resolve(options)
-    }
-
-    return reject('no url/html provided')
-  }).then(options => {
-    winston.info('requested', options)
+const uriFromData = async ({ fields, files, options }) => {
+  if (options.url) {
+    options.uri = options.url
 
     return options
-  })
+  }
 
-const handler = (request, response) => {
+  if (options.custom_url) {
+    const body = await request({
+      method: 'GET',
+      url: options.custom_url,
+      followAllRedirects: true,
+      encoding: null
+    })
+
+    let string
+    if (options.encoding) {
+      string = iconv.decode(body, options.encoding)
+    } else {
+      string = body.toString()
+    }
+
+    if (options.delete) {
+      let dom = new JSDOM(string)
+      let node = dom.window.document.getElementById(options.delete)
+      node.parentNode.removeChild(node)
+      string = dom.serialize()
+    }
+
+    const path = await stringToFile(string)
+
+    options.uri = `file://${path}`
+
+    return options
+  }
+
+  if (fields.url) {
+    let formUrl = url.parse(fields.url)
+
+    if (!formUrl) return reject()
+
+    options.uri = formUrl.href
+
+    return options
+  }
+
+  if (fields.html) {
+    const path = await stringToFile(fields.html)
+
+    options.uri = `file://${path}`
+
+    return options
+  }
+
+  if (files.html) {
+    options.uri = `file://${files.html.path}`
+
+    return options
+  }
+
+  throw new Error('no url/html provided')
+}
+
+const handler = async (request, response) => {
   switch (request.url) {
     case '/favicon.ico':
       response.writeHead(200, { 'Content-Type': 'image/x-icon' })
@@ -122,26 +113,35 @@ const handler = (request, response) => {
       break
 
     default:
-      requestData(request)
-        .then(uriFromData)
-        .then(converter.uriToPdf)
-        .then(pdf => {
-          response.writeHead(200, {
-            'Content-Type': 'application/pdf',
-            'Content-Length': pdf.byteLength
-          })
-          response.end(pdf)
+      try {
+        const data = await requestData(request)
+
+        const options = await uriFromData(data)
+
+        winston.info('requested', options)
+
+        const pdf = await converter.uriToPdf(options)
+
+        response.writeHead(200, {
+          'Content-Type': 'application/pdf',
+          'Content-Length': pdf.byteLength
         })
-        .catch(reason => {
-          response.writeHead(400)
-          response.end()
-          winston.warn(reason)
-        })
+
+        response.end(pdf)
+      } catch (e) {
+        response.writeHead(400)
+        response.end()
+
+        winston.warn(e)
+      }
   }
 }
+;(async () => {
+  await converter.launchChrome()
 
-converter.launchChrome()
-  .then(() => {
-    http.createServer(handler).listen(process.env.PORT)
-    winston.info(`Listening Port ${process.env.PORT}`)
-  })
+  const server = http.createServer(handler)
+
+  server.listen(process.env.PORT)
+
+  winston.info(`Listening Port ${process.env.PORT}`)
+})()
