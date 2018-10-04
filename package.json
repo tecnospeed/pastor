@@ -19,7 +19,7 @@
   "devDependencies": {
     "jest": "^20.0.4",
     "prettier": "^1.11.1",
-    "prettier-standard": "^8.0.0"
+    "prettier-standard": "^8.0.1"
   },
   "dependencies": {
     "formidable": "^1.2.0",
@@ -27,7 +27,7 @@
     "jsdom": "^11.6.2",
     "puppeteer": "^1.5.0",
     "qs": "^6.5.1",
-    "request": "^2.83.0",
+    "request": "^2.88.0",
     "tmp": "0.0.33",
     "winston": "^2.4.0",
     "xmldom": "^0.1.27"
