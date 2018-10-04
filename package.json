@@ -3,9 +3,7 @@
   "version": "0.1.0",
   "description": "A RESTful API to generate Portable Document Format (PDF) converting from Hypertext Markup Language (HTML).",
   "main": "index.js",
-  "scripts": {
-    "test": "jest"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tecnospeed/pastor.git"
@@ -17,7 +15,6 @@
   },
   "homepage": "https://github.com/tecnospeed/pastor#readme",
   "devDependencies": {
-    "jest": "^20.0.4",
     "prettier": "^1.11.1",
     "prettier-standard": "^8.0.1"
   },
