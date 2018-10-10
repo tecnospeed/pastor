@@ -45,15 +45,15 @@ const uriToBuffer = uri =>
 const stringToFile = string =>
   new Promise((resolve, reject) =>
     tmp.file({ postfix: '.html' }, (err, path) => {
-      if (err) return reject(err.message);
+      if (err) return reject(err.message)
 
       fs.writeFile(path, string, err => {
-        if (err) return reject(err.message);
+        if (err) return reject(err.message)
 
-        return resolve(path);
-      });
+        return resolve(path)
+      })
     })
-  );
+  )
 
 const uriFromData = ({ fields, files, options }) =>
   new Promise((resolve, reject) => {
@@ -89,7 +89,7 @@ const uriFromData = ({ fields, files, options }) =>
     if (fields.url) {
       let formUrl = url.parse(fields.url)
 
-      if (!formUrl) return reject()
+      if (!formUrl) return reject(new Error('can\'t parse url'))
 
       options.uri = formUrl.href
 
@@ -102,14 +102,14 @@ const uriFromData = ({ fields, files, options }) =>
         return resolve(options)
       })
     }
-    
+
     if (files.html) {
       options.uri = `file://${files.html.path}`
 
       return resolve(options)
     }
 
-    return reject('no url/html provided')
+    return reject(new Error('no url/html provided'))
   }).then(options => {
     winston.info('requested', options)
 
