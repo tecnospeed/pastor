@@ -39,10 +39,10 @@ ENV PORT 8080
 
 EXPOSE 8080
 
-COPY package.json package-lock.json ./
+COPY --chown=pastor:pastor package.json package-lock.json ./
 
 RUN npm install --production
 
-COPY ./ ./
+COPY --chown=pastor:pastor ./ ./
 
 CMD ["node", "index.js"]
