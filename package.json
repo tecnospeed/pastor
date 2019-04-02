@@ -22,7 +22,7 @@
     "formidable": "^1.2.0",
     "iconv-lite": "^0.4.19",
     "jsdom": "^11.6.2",
-    "puppeteer": "^1.5.0",
+    "puppeteer": "^1.14.0",
     "qs": "^6.5.1",
     "request": "^2.88.0",
     "tmp": "0.0.33",
