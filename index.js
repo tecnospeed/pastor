@@ -8,22 +8,15 @@ const tmp = require('tmp')
 const url = require('url')
 const qs = require('qs')
 const fs = require('fs')
-const urlValidator = require('valid-url')
 
 const converter = require('./lib/converter')
-
-const validateUrl = url => {
-  return urlValidator.isUri(url)
-}
 
 const requestData = request =>
   new Promise((resolve, reject) => {
     let form = new formidable.IncomingForm()
-    form.keepExtensions = true
+    form.keepExtensions = true;
     form.parse(request, (err, fields, files) => {
-      if (err || !validateUrl(request.url)) {
-        return reject(err || 'Invalid URL')
-      }
+      if (err) return reject(err)
 
       let options = qs.parse(url.parse(request.url).query)
 
