@@ -15,18 +15,18 @@
   },
   "homepage": "https://github.com/tecnospeed/pastor#readme",
   "devDependencies": {
-    "prettier": "^1.11.1",
+    "prettier": "^1.16.4",
     "prettier-standard": "^8.0.1"
   },
   "dependencies": {
-    "formidable": "^1.2.0",
-    "iconv-lite": "^0.4.19",
-    "jsdom": "^11.6.2",
+    "formidable": "^1.2.1",
+    "iconv-lite": "^0.4.24",
+    "jsdom": "^11.12.0",
     "puppeteer": "^1.14.0",
-    "qs": "^6.5.1",
+    "qs": "^6.7.0",
     "request": "^2.88.0",
     "tmp": "0.0.33",
-    "winston": "^2.4.0",
+    "winston": "^2.4.4",
     "xmldom": "^0.1.27"
   }
 }
