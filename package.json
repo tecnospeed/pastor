@@ -14,10 +14,7 @@
     "url": "https://github.com/tecnospeed/pastor/issues"
   },
   "homepage": "https://github.com/tecnospeed/pastor#readme",
-  "devDependencies": {
-    "prettier": "^1.16.4",
-    "prettier-standard": "^8.0.1"
-  },
+  "devDependencies": {},
   "dependencies": {
     "formidable": "^1.2.1",
     "iconv-lite": "^0.4.24",
